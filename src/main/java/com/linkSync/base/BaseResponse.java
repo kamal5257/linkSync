@@ -1,7 +1,9 @@
 package com.linkSync.base;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -22,7 +24,7 @@ public class BaseResponse<T>
     @JsonInclude(Include.NON_NULL)
     private String  message;
     @JsonInclude(Include.NON_NULL)
-    private List<T> data = null;
+    private Map<String, Object> data = new HashMap<>();
     private String  txnId;
 	public String getTxnId() {
 		return txnId;
@@ -42,10 +44,10 @@ public class BaseResponse<T>
 	public void setMessage(String message) {
 		this.message = message;
 	}
-	public List<T> getData() {
+	public Map<String, Object> getData() {
 		return data;
 	}
-	public void setData(List<T> data) {
+	public void setData(Map<String, Object> data) {
 		this.data = data;
 	}
 	
@@ -57,7 +59,7 @@ public class BaseResponse<T>
 	public BaseResponse() {
 		super();
 	}
-	public BaseResponse(String statusCode, String message, List<T> data, String txnId) {
+	public BaseResponse(String statusCode, String message, Map<String, Object> data, String txnId) {
 		super();
 		this.statusCode = statusCode;
 		this.message = message;

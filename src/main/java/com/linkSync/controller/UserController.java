@@ -2,6 +2,7 @@ package com.linkSync.controller;
 
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.apache.logging.log4j.LogManager;
@@ -42,8 +43,12 @@ public class UserController {
 	private UserService userService;
 
 	@RequestMapping(value = REGISTER, method = RequestMethod.POST)
-	public BaseResponse<Object> createUser(@RequestBody UserDTO userDTO) {	
-		return userService.registerNewUser(userDTO);
+	public BaseResponse<Object> createUser(@RequestBody UserDTO userDTO) {
+		BaseResponse<Object> response = new BaseResponse<>();
+		APPServiceCode serviceCode = userService.registerNewUser(userDTO);
+		response.setMessage(serviceCode.getStatusDesc());
+		response.setStatusCode(serviceCode.getStatusCode());
+		return response;
 	}
 
 	@RequestMapping(value = AUTHENTICATE, method = { RequestMethod.POST })
@@ -95,16 +100,36 @@ public class UserController {
 		}
 		return result;
 	}
-	
-	 @PostMapping("/verify-otp")
-	    public BaseResponse<Object> verifyOtp(@RequestBody OtpVerificationRequest request) {
-	        return userService.verifyOtp(request);
-	    }
 
-	    @PostMapping("/reset-password")
-	    public BaseResponse<Object> resetPassword(@RequestBody ResetPasswordRequest request) {
-	        return userService.resetPassword(request);
-	    }
+	@PostMapping("/verify-otp")
+	public BaseResponse<Object> verifyOtp(@RequestBody OtpVerificationRequest request) {
+		return userService.verifyOtp(request);
+	}
+
+	@PostMapping("/reset-password")
+	public BaseResponse<Object> resetPassword(@RequestBody ResetPasswordRequest request) {
+		return userService.resetPassword(request);
+	}
+
+	@PostMapping("/user")
+	public BaseResponse<Object> getUser(HttpServletRequest request) {
+		BaseResponse<Object> result = new BaseResponse<Object>();
+		APPServiceCode code = null;
+		String authHeader = request.getHeader("Authorization");
+
+		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+			code = APPServiceCode.APP_909;
+		}
+
+		String token = authHeader.substring(7);
+		result = userService.getUserFromToken(token);
+
+		if (result == null) {
+			code = APPServiceCode.APP_910;
+		}
+
+		return result;
+	}
 
 }
 
